@@ -7,7 +7,10 @@ const errors=[];
 async function open(options={}){const context=await browser.newContext({viewport:{width:1440,height:1000},...options});const page=await context.newPage();page.on('pageerror',e=>{errors.push(e.message);console.error(e.message);});page.on('console',m=>{if(m.type()==='error')console.error(m.text());});await page.goto(url);await page.waitForFunction(()=>window.gameDiagnostics?.state.status==='connected'&&window.gameDiagnostics.state.gameState,{},{timeout:45000});return {context,page};}
 const read=page=>page.evaluate(()=>window.gameDiagnostics.state);
 try{
- const a=await open(),b=await open();await a.page.locator('[data-class="valkyrie"]').click();await b.page.locator('[data-class="valkyrie"]').click();await a.page.waitForTimeout(400);
+ const a=await open(),b=await open();
+ for(const name of ['warrior','valkyrie','wizard','elf']){await a.page.locator(`[data-class="${name}"]`).click();await a.page.waitForFunction(n=>window.gameDiagnostics.state.gameState.players.find(p=>p.id===window.gameDiagnostics.state.sessionId).className===n,name);}
+ await a.page.locator('[data-class="wizard"]').click();await b.page.locator('[data-class="wizard"]').click();await a.page.waitForTimeout(350);assert((await read(a.page)).gameState.players.every(p=>p.className==='wizard'));
+ await a.page.locator('[data-class="valkyrie"]').click();await b.page.locator('[data-class="valkyrie"]').click();await a.page.waitForTimeout(400);
  let state=await read(a.page),g=state.gameState;assert.equal(g.players.length,2);assert(g.players.every(p=>p.className==='valkyrie'));assert.equal(new Set(g.players.map(p=>p.color)).size,2);
  await a.page.screenshot({path:'project-name/documentation/game-desktop.png'});
  await b.context.close();await a.page.bringToFront();

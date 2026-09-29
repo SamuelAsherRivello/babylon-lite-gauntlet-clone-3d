@@ -4,7 +4,9 @@ A cooperative 3D dungeon crawler for 1–4 browser players, inspired by Gauntlet
 
 ## Live Demo
 
-Deployment verification is pending. The public repository is [babylon-lite-gauntlet-clone-3d](https://github.com/SamuelAsherRivello/babylon-lite-gauntlet-clone-3d).
+[Play Gauntlet 3D](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) · [Release v0.0.3](https://github.com/SamuelAsherRivello/babylon-lite-gauntlet-clone-3d/releases/tag/v0.0.3)
+
+Open the same link on up to four devices. Use current Chrome or Edge with WebGPU enabled.
 
 ![Two players selecting the same hero](project-name/documentation/game-desktop.png)
 
@@ -39,7 +41,7 @@ npm run preview
 
 Vite prints the local URL, including `/babylon-lite-gauntlet-clone-3d/`. No secrets are needed. The default client connects to the public backend. For isolated development, run the [shared server](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server) and set `VITE_SERVER_URL` to its origin before starting Vite.
 
-`npm run test:browser` uses installed Chrome and two isolated browser contexts, then completes the level through keyboard controls and checks a touch viewport. Its default URL is the dev server on port 5186; override `GAME_URL` if needed. Run it against an isolated backend because it plays and restarts the room. Touch is emulated; physical mobile hardware has not been tested.
+`npm run test:browser` uses installed Chrome and two isolated browser contexts, then completes the level through keyboard controls and checks a touch viewport. Its default URL is the dev server on port 5186; override `GAME_URL` if needed. Run it against an isolated backend because it plays and restarts the room. `node project-name/test/recovery.mjs` additionally verifies natural defeat, restart, disconnect/retry, unsupported WebGPU, and simultaneous touch cancellation. Touch is emulated; physical mobile hardware has not been tested.
 
 ## Architecture and artwork
 
