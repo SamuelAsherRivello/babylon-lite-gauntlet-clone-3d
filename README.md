@@ -1,94 +1,99 @@
-<!-- AI: Keep commands rooted at the repository. The Vite application, source, tests, and build output belong in project-name/. -->
-![Samuel Asher Rivello](project-name/documentation/samuel-asher-rivello-banner.png)
+# Gauntlet Clone 3D
 
-# {project-name}
-
-<!-- AI: Update this project summary when the template is used. -->
-This is the project repo....
-
-## Images
-
-### Screenshots
-
-<a href="project-name/documentation/screenshot01.png"><img src="project-name/documentation/screenshot01.png" width="400" alt="Screenshot placeholder" /></a>
+A cooperative 3D dungeon crawler for 1–4 browser players, inspired by Gauntlet. Original low-poly Blender heroes, monsters and dungeon assets; Babylon Lite renders the world with WebGPU.
 
 ## Live Demo
 
-- [{live-demo-url}](https://samuelasherrivello.github.io/github-repository-template/)
+Deployment verification is pending. The public repository is [babylon-lite-gauntlet-clone-3d](https://github.com/SamuelAsherRivello/babylon-lite-gauntlet-clone-3d).
 
-## Table of Contents
+![Two players selecting the same hero](project-name/documentation/game-desktop.png)
 
-1. [Images](#images)
-2. [Live Demo](#live-demo)
-3. [Getting Started](#getting-started)
-4. [Project Details](#project-details)
-5. [Credits](#credits)
+## Play
 
-## Getting Started
+Destroy four summoning altars, collect the key, and reach the northern gate. Ghosts chase, grunts strike, demons shoot, and lobbers throw telegraphed bombs. Food heals; treasure adds party gold. One complete handcrafted level supports solo play or 2–4 cooperating players.
 
-<!-- AI: Update this getting-started summary when the template is used. -->
-This is the getting started...
+Choose Warrior, Valkyrie, Wizard, or Elf at any time using the four portrait buttons. Duplicate classes are allowed; player numbers, colored rings, labels, and health bars distinguish everyone. Switching retains health percentage and ability cooldowns.
 
-### 🛠 Build Project
+| Control | Action |
+| --- | --- |
+| WASD / arrows | Move |
+| Hold Space | Attack with automatic targeting |
+| E | Magic burst, 10-second cooldown |
+| 1–4 / portrait buttons | Instantly switch hero |
+| Touch joystick + Attack / Magic | Mobile controls |
+| Escape / Pause controls | Stop local controls; the shared world continues |
 
-1. From the repository root, run `npm install`.
-2. Run `npm run build`.
+After victory or party defeat, the lowest active player number can restart. A fallen player waits for allies to finish. Open the same game URL to hot join the public four-seat room; a fifth player receives a full-room message and can retry when a seat opens.
 
-### 🛠 Run Project
+## Development
 
-1. From the repository root, run `npm run dev` and open the localhost URL Vite prints.
-2. Run `npm test` to execute the focused source checks.
+Use Node.js 24 and npm. A current Chrome or Edge with WebGPU and hardware acceleration is required.
 
-### 🛠 Release Version
+```sh
+npm ci
+npm run dev
+npm test
+npm run build
+npm run preview
+```
 
-1. Run `npm test` and `npm run build` from the repository root.
-2. Push to `main` to deploy through the GitHub Pages workflow.
-3. Run the **Release** workflow from GitHub Actions to bump the patch version, tag it, and create the GitHub release.
+Vite prints the local URL, including `/babylon-lite-gauntlet-clone-3d/`. No secrets are needed. The default client connects to the public backend. For isolated development, run the [shared server](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server) and set `VITE_SERVER_URL` to its origin before starting Vite.
 
-## Project Details
+`npm run test:browser` uses installed Chrome and two isolated browser contexts, then completes the level through keyboard controls and checks a touch viewport. Its default URL is the dev server on port 5186; override `GAME_URL` if needed. Run it against an isolated backend because it plays and restarts the room. Touch is emulated; physical mobile hardware has not been tested.
 
-<!-- AI: Update these project details when the template is used. -->
-This is the project details...
+## Architecture and artwork
 
-### 📝 Structure
+- `project-name/src/main.js`: shared client, HUD, keyboard/touch input, recovery states.
+- `project-name/src/view.js`: Babylon Lite WebGPU scene, pooled GLB instances, camera and player labels.
+- `project-name/art/dungeon-kit.blend`: editable original models; `build_assets.py` records their construction.
+- `project-name/public/assets`: sixteen original GLBs and four rendered hero portraits.
+- Server-authoritative collision, enemies, combat, pickups, objectives and restart run in the shared `gauntlet-3d` room. The game pins the released `@rmc/multiplayer-client` v0.5.0 GitHub asset.
 
-- `project-name/index.html` provides the plain safe-area HTML shell.
-- `project-name/test/` contains focused automated checks for the starter.
-- `project-name/documentation/` contains canonical README images and project
-  documentation assets.
+Imported skills are real files in `.agents/skills`. Explore and apply were used for four major systems: network/session lifecycle and combat/level rules in the shared server; dungeon artwork and browser client in this repository. OpenSpec holds their acceptance specifications and implementation records.
 
-### 📦 AI
+## Release
 
-- `AGENTS.md` contains repository-specific AI agent guidance.
-- `AGENTS_TEMPLATE_USAGE_CHECKLIST.md` contains the template reuse checklist.
-- [openspec](openspec/) contains the repository's specification workflow
-  configuration.
+The checked-in **Release** GitHub Actions workflow tests/builds, increments the patch number in `version.txt`, commits, tags, and publishes a GitHub release. Then dispatch **Deploy live demo** on `main` because bot commits do not trigger push workflows. Pages builds with the repository subpath; verify the displayed version and actual gameplay after deployment.
 
-### 📦 Packages
+Sessions are temporary and public, without accounts, private room codes, host migration, or persistence. Reloading creates a fresh player. Server restarts reset the level. This small game intentionally has one level and no audio.
 
-- [Vite](https://vite.dev/) provides local development and production builds.
+## Original AI Prompt
 
+<details>
+<summary>Original request and follow-up</summary>
+
+```text
+[$rmc-game-creator](C:\Users\srive\\.agents\skills\rmc-game-creator\SKILL.md) Create a new MULTIPLAYER game in a public repo.
+Using this template: https://github.com/SamuelAsherRivello/github-repository-template
+
+Import these codex skills to use to make art https://github.com/SamuelAsherRivello/ai-skills-blender/
+
+This is a 3d version of the top-down classic game Gauntlet.
+
+https://en.wikipedia.org/wiki/Gauntlet_(1985_video_game)
+
+Remake: https://store.steampowered.com/app/258970/Gauntlet_Slayer_Edition/
+
+Have one complete level with 4 enemies taken from the real game.
+
+Its 3d, topdown view. Create your own world assets and players. Use a imple stylized but identifiable set of assets using the https://github.com/SamuelAsherRivello/ai-skills-blender/ codex skills here.
+
+Offer 4 selectable characters. The player hot joins, then on the ui there are 4 buttons for them to instantly switch to nother player.
+
+The game supports 1-4 players. Dynamically color each player or its in-world ui on th eplayer a unique color so 2+ players can choose the same character yet still distinguis themselves arpart.
+```
+
+Follow-up:
+
+```text
+import these skills and use the explore and apply for each major system in the game. https://github.com/SamuelAsherRivello/ai-skills-library/. Optional is to use other skills too.
+```
+
+Links above preserve the supplied destinations; chat-specific link formatting is normalized.
+</details>
 
 ## Credits
 
-<!-- AI: Preserve established attribution and ownership. Customize the following subsections only from confirmed contributor, contact, and license information; do not infer a new owner from the repository name. -->
-### 💡 Contributors
+Created for Samuel Asher Rivello / Rivello Multimedia Consulting. [Portfolio](https://www.samuelasherrivello.com/) · [GitHub](https://github.com/SamuelAsherRivello).
 
-<!-- AI: Preserve existing contributor credit and add contributors only when confirmed. Do not automatically advance experience counts or their reference year. -->
-- Samuel Asher Rivello - Over 25 years of game development XP (2026)
-
-### 💡 Contact
-
-<!-- AI: Preserve confirmed contact destinations and their order unless requested otherwise. Use readable display URLs without a protocol or trailing slash while keeping the real link target intact. Do not invent accounts or change target capitalization based on display styling. -->
-- [LinkedIn.com/in/SamuelAsherRivello](https://Linkedin.com/in/SamuelAsherRivello) ⭐ 
-- [GitHub.com/SamuelAsherRivello](https://github.com/SamuelAsherRivello/)
-- [Twitter.com/srivello](https://twitter.com/srivello/)
-- Resume / Portfolio: [SamuelAsherRivello.com](http://www.SamuelAsherRivello.com)
-
-
-### 💡 License
-
-<!-- AI: Keep the license name linked to the actual relative license file and verify that its terms match this statement. Keep the copyright holder and year consistent with that file. Do not change license terms, ownership, or dates without an explicit request. -->
-- Provided as-is under the [MIT License](LICENSE).
-
-- Copyright © 2026 Rivello Multimedia Consulting, LLC.
+Based on [GitHub Repository Template](https://github.com/SamuelAsherRivello/github-repository-template). See [provenance](project-name/documentation/provenance.md) and [artwork verification](project-name/documentation/artwork.md). Gauntlet is a gameplay reference; this project uses original artwork and is not an official Atari or Warner Bros. release.

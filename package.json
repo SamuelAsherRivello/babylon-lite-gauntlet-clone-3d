@@ -1,19 +1,21 @@
 {
-  "name": "github-repository-template",
+  "name": "babylon-lite-gauntlet-clone-3d",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test --test-isolation=none project-name/test/page.test.mjs project-name/test/openspec-skills.test.mjs"
+    "test": "node --test project-name/test/*.test.mjs",
+    "test:browser": "node project-name/test/browser.mjs"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^6.1.1",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "@babylonjs/lite": "1.32.0",
+    "@rmc/multiplayer-client": "https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/releases/download/v0.5.0/rmc-multiplayer-client-0.5.0.tgz"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "agent-browser": "0.38.1",
     "vite": "^8.3.0"
   }
 }

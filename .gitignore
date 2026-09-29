@@ -9,3 +9,7 @@ node_modules/
 .env.*
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+
+.skill-import-backup/
+
+project-name/documentation/browser-first.png

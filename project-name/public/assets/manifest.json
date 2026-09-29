@@ -1,0 +1,87 @@
+{
+  "blender": "5.2.2 LTS",
+  "assets": {
+    "warrior": {
+      "vertices": 352,
+      "polygons": 386,
+      "file": "warrior.glb"
+    },
+    "valkyrie": {
+      "vertices": 399,
+      "polygons": 429,
+      "file": "valkyrie.glb"
+    },
+    "wizard": {
+      "vertices": 334,
+      "polygons": 366,
+      "file": "wizard.glb"
+    },
+    "elf": {
+      "vertices": 369,
+      "polygons": 389,
+      "file": "elf.glb"
+    },
+    "grunt": {
+      "vertices": 324,
+      "polygons": 370,
+      "file": "grunt.glb"
+    },
+    "demon": {
+      "vertices": 324,
+      "polygons": 382,
+      "file": "demon.glb"
+    },
+    "lobber": {
+      "vertices": 352,
+      "polygons": 436,
+      "file": "lobber.glb"
+    },
+    "ghost": {
+      "vertices": 122,
+      "polygons": 130,
+      "file": "ghost.glb"
+    },
+    "floor": {
+      "vertices": 48,
+      "polygons": 52,
+      "file": "floor.glb"
+    },
+    "wall": {
+      "vertices": 168,
+      "polygons": 182,
+      "file": "wall.glb"
+    },
+    "altar": {
+      "vertices": 76,
+      "polygons": 82,
+      "file": "altar.glb"
+    },
+    "food": {
+      "vertices": 108,
+      "polygons": 186,
+      "file": "food.glb"
+    },
+    "key": {
+      "vertices": 96,
+      "polygons": 100,
+      "file": "key.glb"
+    },
+    "treasure": {
+      "vertices": 72,
+      "polygons": 78,
+      "file": "treasure.glb"
+    },
+    "exit": {
+      "vertices": 120,
+      "polygons": 144,
+      "file": "exit.glb"
+    },
+    "torch": {
+      "vertices": 60,
+      "polygons": 50,
+      "file": "torch.glb"
+    }
+  },
+  "source": "project-name/art/dungeon-kit.blend",
+  "limitations": "Static meshes; movement and attack motion are runtime transforms. Solid-color materials; no baked textures."
+}

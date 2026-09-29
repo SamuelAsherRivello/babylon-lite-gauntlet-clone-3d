@@ -23,8 +23,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Test template
-        run: npm test
+      - name: Install dependencies
+        run: npm ci
+      - name: Test and build game
+        run: |
+          npm test
+          npm run build
       - name: Bump patch version
         id: version
         shell: bash

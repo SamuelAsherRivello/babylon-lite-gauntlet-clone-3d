@@ -1,0 +1,30 @@
+import {createEngine,createSceneContext,createArcRotateCamera,enableOrthographicCamera,createHemisphericLight,createDirectionalLight,loadGltf,addToScene,registerScene,startEngine,createHierarchyInstancePool,setHierarchyInstanceCount,setHierarchyInstanceMatrix,addHierarchyInstance,createTorus,createSphere,createStandardMaterial,createTransformNode,onBeforeRender,resizeEngine,disposeScene,getViewMatrix,getViewProjectionMatrix,projectWorldToScreen} from '@babylonjs/lite';
+const names=['warrior','valkyrie','wizard','elf','ghost','grunt','demon','lobber','floor','wall','altar','food','key','treasure','exit','torch'],colors=['#49d9ff','#ff719c','#ffcf5a','#a995ff'];
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
+export function matrix(x,y,z,a=0,k=1){const c=Math.cos(a)*k,s=Math.sin(a)*k;return new Float32Array([c,0,-s,0,0,k,0,0,s,0,c,0,x,y,z,1]);}
+export async function createDungeonView(canvas,labels,base){
+ if(!navigator.gpu)throw Error('WebGPU is not exposed by this browser.');
+ const engine=await createEngine(canvas,{msaaSamples:4}),scene=createSceneContext(engine);scene.clearColor={r:.025,g:.045,b:.055,a:1};
+ const camera=createArcRotateCamera(-Math.PI/2,.48,30,{x:10,y:0,z:-19});scene.camera=camera;const ortho=enableOrthographicCamera(camera,{halfHeight:7.5});
+ const ambient=createHemisphericLight([0,1,0],.65);ambient.groundColor=[.15,.19,.23];addToScene(scene,ambient);const sun=createDirectionalLight([-.5,-1,.4],1);sun.diffuse=[1,.85,.64];addToScene(scene,sun);
+ const pools={};await Promise.all(names.map(async name=>{const asset=await loadGltf(engine,base+'assets/'+name+'.glb');pools[name]=createHierarchyInstancePool(asset.entities[0],name==='floor'||name==='wall'?600:64);addToScene(scene,asset);}));
+ function effect(mesh,capacity,color){const m=createStandardMaterial();m.diffuseColor=rgb(color);m.emissiveColor=rgb(color).map(v=>v*.5);m.specularColor=[0,0,0];mesh.material=m;const root=createTransformNode('effect');root.children.push(mesh);mesh.parent=root;const p=createHierarchyInstancePool(root,capacity);addToScene(scene,root);return p;}
+ const rings=colors.map(c=>effect(createTorus(engine,{diameter:1.2,thickness:.075,tessellation:24}),1,c)),friendly=effect(createSphere(engine,{diameter:.2,segments:6}),80,'#ffe09b'),hostile=effect(createSphere(engine,{diameter:.25,segments:6}),80,'#ff644f'),danger=effect(createTorus(engine,{diameter:2.8,thickness:.07,tessellation:24}),24,'#ff514e'),magic=effect(createTorus(engine,{diameter:7,thickness:.08,tessellation:32}),4,'#83fbe0');
+ let state=null,me=null,mapBuilt=false,disposed=false;const last=new Map();
+ const labelNodes=colors.map((c,i)=>{const e=document.createElement('span');e.className='world-label';e.style.color=c;e.textContent='P'+(i+1);labels.append(e);return e;});
+ function put(pool,list){setHierarchyInstanceCount(pool,Math.min(list.length,pool.capacity));list.slice(0,pool.capacity).forEach((m,i)=>setHierarchyInstanceMatrix(pool,i,m));}
+ function buildMap(g){for(let z=0;z<g.level.length;z++)for(let x=0;x<g.level[z].length;x++){addHierarchyInstance(pools.floor,matrix(x,0,-z));if(g.level[z][x]==='#')addHierarchyInstance(pools.wall,matrix(x,0,-z));}addHierarchyInstance(pools.exit,matrix(g.exit.x,0,-g.exit.z));for(const [x,z]of [[6,22],[14,22],[1,15],[19,15],[1,8],[19,8],[8,2],[12,2]])addHierarchyInstance(pools.torch,matrix(x,0,-z,.2,.8));mapBuilt=true;}
+ await registerScene(scene);
+ onBeforeRender(scene,delta=>{
+  if(!state||disposed)return;const dt=Math.min(delta/1000,.1),g=state;if(!mapBuilt)buildMap(g);const grouped=Object.fromEntries(names.map(n=>[n,[]]));
+  for(const p of g.players){const old=last.get(p.id)||{x:p.x,z:p.z},moved=Math.hypot(old.x-p.x,old.z-p.z);old.x+=(p.x-old.x)*Math.min(1,dt*16);old.z+=(p.z-old.z)*Math.min(1,dt*16);last.set(p.id,old);const bob=p.hp>0&&moved>.02?Math.sin(performance.now()*.018)*.045:0;grouped[p.className].push(matrix(old.x,p.hp>0?bob:.05,-old.z,Math.PI-p.angle,p.hp>0?1:.35));put(rings[p.number-1],[matrix(old.x,.06,-old.z)]);}
+  for(let i=0;i<4;i++)if(!g.players.some(p=>p.number===i+1))put(rings[i],[]);
+  for(const e of g.enemies)grouped[e.kind].push(matrix(e.x,e.kind==='ghost'?.1+Math.sin(g.time*3)*.06:0,-e.z,Math.PI-e.angle,.85));
+  for(const a of g.generators)if(a.hp>0)grouped.altar.push(matrix(a.x,0,-a.z));for(const p of g.pickups)grouped[p.kind].push(matrix(p.x,p.kind==='key'?.25+Math.sin(g.time*2)*.08:.03,-p.z,p.kind==='key'?g.time:0));
+  for(const name of names.filter(n=>!['floor','wall','exit','torch'].includes(n)))put(pools[name],grouped[name]);put(friendly,g.shots.filter(s=>!s.hostile).map(s=>matrix(s.x,.7,-s.z)));put(hostile,g.shots.filter(s=>s.hostile).map(s=>matrix(s.x,.7,-s.z)));put(danger,g.blasts.filter(b=>b.hostile).map(b=>matrix(b.x,.06,-b.z,0,.9+.1*Math.sin(g.time*20))));put(magic,g.blasts.filter(b=>!b.hostile).map(b=>matrix(b.x,.12,-b.z,0,1-b.time)));
+  const player=g.players.find(p=>p.id===me)||g.players.find(p=>p.hp>0)||g.players[0];if(player){camera.target.x+=(Math.max(5,Math.min(15,player.x))-camera.target.x)*Math.min(1,dt*7);camera.target.z+=(-Math.max(5,Math.min(19,player.z))-camera.target.z)*Math.min(1,dt*7);}
+  const w=canvas.clientWidth,h=canvas.clientHeight;ortho.halfHeight=Math.max(6,5.4*h/w);const view=getViewMatrix(camera),vp=getViewProjectionMatrix(camera,w/h),opts={viewport:{x:0,y:0,width:canvas.width,height:canvas.height},backingWidth:canvas.width,backingHeight:canvas.height,cssWidth:w,cssHeight:h};
+  for(let i=0;i<4;i++){const p=g.players.find(p=>p.number===i+1),el=labelNodes[i];el.hidden=!p;if(p){const pos=projectWorldToScreen({x:p.x,y:2,z:-p.z},view,vp,opts);el.hidden=pos.offscreen;el.style.transform=`translate(${pos.cssX}px,${pos.cssY}px) translate(-50%,-50%)`;el.textContent=`P${p.number}${p.id===me?' · YOU':''}`;}}
+ });
+ await startEngine(engine);const observer=new ResizeObserver(()=>resizeEngine(engine));observer.observe(canvas);return {setState(g,id){state=g;me=id;},dispose(){disposed=true;observer.disconnect();disposeScene(scene);labels.replaceChildren();}};
+}
