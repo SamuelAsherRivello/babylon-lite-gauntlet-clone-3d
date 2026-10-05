@@ -8,9 +8,19 @@ A cooperative 3D dungeon crawler for 1–4 browser players, inspired by Gauntlet
 
 Open the same link on up to four devices. Use current Chrome or Edge with WebGPU enabled.
 
+## Images
+
 ![Two players selecting the same hero](project-name/documentation/game-desktop.png)
 
-## Play
+## Table of Contents
+
+1. [Getting Started](#getting-started)
+2. [Project Details](#project-details)
+3. [Credits](#credits)
+
+## Getting Started
+
+### How to Play
 
 Destroy four summoning altars, collect the key, and reach the northern gate. Ghosts chase, grunts strike, demons shoot, and lobbers throw telegraphed bombs. Food heals; treasure adds party gold. One complete handcrafted level supports solo play or 2–4 cooperating players.
 
@@ -27,7 +37,7 @@ Choose Warrior, Valkyrie, Wizard, or Elf at any time using the four portrait but
 
 After victory or party defeat, the lowest active player number can restart. A fallen player waits for allies to finish. Open the same game URL to hot join the public four-seat room; a fifth player receives a full-room message and can retry when a seat opens.
 
-## Development
+### Development
 
 Use Node.js 24 and npm. A current Chrome or Edge with WebGPU and hardware acceleration is required.
 
@@ -43,7 +53,9 @@ Vite prints the local URL, including `/babylon-lite-gauntlet-clone-3d/`. No secr
 
 `npm run test:browser` uses installed Chrome and two isolated browser contexts, then completes the level through keyboard controls and checks a touch viewport. Its default URL is the dev server on port 5186; override `GAME_URL` if needed. Run it against an isolated backend because it plays and restarts the room. `node project-name/test/recovery.mjs` additionally verifies natural defeat, restart, disconnect/retry, unsupported WebGPU, and simultaneous touch cancellation. Touch is emulated; physical mobile hardware has not been tested.
 
-## Architecture and artwork
+## Project Details
+
+### Architecture and artwork
 
 - `project-name/src/main.js`: shared client, HUD, keyboard/touch input, recovery states.
 - `project-name/src/view.js`: Babylon Lite WebGPU scene, pooled GLB instances, camera and player labels.
@@ -53,7 +65,7 @@ Vite prints the local URL, including `/babylon-lite-gauntlet-clone-3d/`. No secr
 
 Imported skills are real files in `.agents/skills`. Explore and apply were used for four major systems: network/session lifecycle and combat/level rules in the shared server; dungeon artwork and browser client in this repository. OpenSpec holds their acceptance specifications and implementation records.
 
-## Release
+### Release
 
 The checked-in **Release** GitHub Actions workflow tests/builds, increments the patch number in `version.txt`, commits, tags, and publishes a GitHub release. Then dispatch **Deploy live demo** on `main` because bot commits do not trigger push workflows. Pages builds with the repository subpath; verify the displayed version and actual gameplay after deployment.
 
